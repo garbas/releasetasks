@@ -1,5 +1,8 @@
 include LICENSE
+include VERSION
 include README.rst
+include requirements.txt
+include requirements-dev.txt
 
 recursive-include releasetasks/templates *
 recursive-include tests *

@@ -7,33 +7,33 @@ try:
 except ImportError:
     from distutils.core import setup
 
+with open('VERSION') as f:
+    version = f.read().strip()
 
-readme = open('README.rst').read()
-requirements = [
-    "Jinja2",
-    "taskcluster>=0.0.24",
-    "arrow",
-    "requests>=2.4.3,<=2.7.0",
-    "PyYAML",
-    "chunkify",
-    "PGPy",
-    "python-jose<=0.5.6",
-    "redo",
-]
-test_requirements = [
-    "pytest",
-    "pytest-cov",
-    "flake8",
-    "mock",
-    "voluptuous",
-]
+with open('README.rst') as f:
+    long_description = f.read()
+
+
+def read_requirements(file_):
+    lines = []
+    with open(file_) as f:
+        for line in f.readlines():
+            line = line.strip()
+            if line.startswith('-e ') or line.startswith('http://') or line.startswith('https://'):
+                lines.append(line.split('#')[1].split('egg=')[1])
+            elif line.startswith('#') or line.startswith('-'):
+                pass
+            else:
+                lines.append(line)
+    return lines
+
 
 setup(
     name='releasetasks',
-    version='0.4.0',
+    version=version,
     description="""Mozilla Release Promotion Tasks contains code to generate
     release-related Taskcluster graphs.""",
-    long_description=readme,
+    long_description=long_description,
     author="Mozilla Release Engineering",
     author_email='release@mozilla.com',
     url='https://github.com/mozilla-releng/releasetasks',
@@ -43,7 +43,7 @@ setup(
     package_dir={'releasetasks':
                  'releasetasks'},
     include_package_data=True,
-    install_requires=requirements,
+    install_requires=read_requirements('requirements.txt'),
     license="MPL",
     zip_safe=False,
     keywords='releasetasks',
@@ -55,5 +55,5 @@ setup(
         'Programming Language :: Python :: 2.7',
     ],
     test_suite='tests',
-    tests_require=test_requirements,
+    tests_require=read_requirements('requirements-dev.txt'),
 )
